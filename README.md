@@ -84,7 +84,7 @@ The following are hardware, software, or systems that we have at our immediate d
         - A thunderbolt DP monitor is connected (three displays total), along with another USB hub in the thunderbolt ports. There is an open thunderbolt port on the mac itself, as well as the dell hub. There is one on the usb hub but not to be relied on.
     - homelab
         - the homelab is crippled at the moment as I've been too lazy to activate the other two nodes (older razer and ancient macbook air)
-        - it is currently just the 2017 razer blade running proxmox, which runs trueNAS. This is connected to a smart switch by ethernet, as is the mac-mini, which connects both to the internet via ethernet port on the wall. The, modem/main router is inaccessible at this hour (someone is sleeping in the room it is in)
+        - it is currently just the 2017 razer blade running proxmox, which runs trueNAS. This is connected to a smart switch by ethernet, as is the mac-mini, which connects both to the internet via ethernet port on the wall. The, modem/main router is inaccessible, as I live with my parents. It is not impossible to work with, but requires permission and extra precautions, since their data is worth far more than mine, I'd imagine.
 
 
 ### How to Read My Writing
