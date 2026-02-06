@@ -28,3 +28,4 @@
 - 2026-02-06 16:58 EST (Codex): Revised baremetal auto-detect to use lsblk mountpoints and a single-disk fallback; avoids findmnt edge cases.
 - 2026-02-06 17:09 EST (Codex): Adjusted baremetal auto-detect to derive parent disk from /boot/efi (or /boot) partition via lsblk PKNAME, matching user’s suggested approach.
 - 2026-02-06 17:20 EST (Codex): Added fallback in baremetal auto-detect to use findmnt if lsblk mountpoint parsing returns empty.
+- 2026-02-06 17:31 EST (Codex): Baremetal detection now succeeds via /boot/efi -> PKNAME; added sudo prompt (sudo -v) and sudo blockdev for disk size to avoid permission errors.
