@@ -26,3 +26,4 @@
 - 2026-02-06 16:35 EST (Codex): Fixed baremetal auto-detect to walk parent devices to the top-level disk (avoids selecting partition like nvme0n1p3).
 - 2026-02-06 16:46 EST (Codex): Reworked baremetal auto-detect to climb to top-level disk by device type and prefer /boot/efi or /boot mount sources.
 - 2026-02-06 16:58 EST (Codex): Revised baremetal auto-detect to use lsblk mountpoints and a single-disk fallback; avoids findmnt edge cases.
+- 2026-02-06 17:09 EST (Codex): Adjusted baremetal auto-detect to derive parent disk from /boot/efi (or /boot) partition via lsblk PKNAME, matching user’s suggested approach.
