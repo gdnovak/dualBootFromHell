@@ -22,3 +22,4 @@
 - 2026-02-06 16:03 EST (Codex): Updated baremetal option to show source disk size, warn about deletion, prompt (y/n), and short-circuit before normal rsync backups.
 - 2026-02-06 16:10 EST (Codex): Baremetal option now auto-detects the source disk from root mount, asks for confirmation, and no longer prompts for manual device entry.
 - 2026-02-06 16:18 EST (Codex): Fixed baremetal auto-detection to handle /dev/mapper root sources by querying lsblk on the mapper device.
+- 2026-02-06 16:26 EST (Codex): Improved baremetal auto-detect: strip btrfs subvol suffix, prefer /boot/efi device to identify disk, then fall back to root mapper.
