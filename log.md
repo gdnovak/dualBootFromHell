@@ -20,3 +20,4 @@
 - 2026-02-06 15:31 EST (Codex): Added baremetal option (3) to /home/tdj/bin/rsync_to_truenas.sh. It prompts for confirmation, asks for source disk, clears /mnt/veyDisk/fedoraBackups/baremetalImage, and streams a full-disk image to NAS.
 - 2026-02-06 15:40 EST (Codex): Fixed rsync_to_truenas.sh to use explicit IP/user and absolute key/known_hosts paths so sudo rsync uses the correct SSH identity (host alias was not available under sudo).
 - 2026-02-06 16:03 EST (Codex): Updated baremetal option to show source disk size, warn about deletion, prompt (y/n), and short-circuit before normal rsync backups.
+- 2026-02-06 16:10 EST (Codex): Baremetal option now auto-detects the source disk from root mount, asks for confirmation, and no longer prompts for manual device entry.
