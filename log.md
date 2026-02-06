@@ -30,3 +30,4 @@
 - 2026-02-06 17:20 EST (Codex): Added fallback in baremetal auto-detect to use findmnt if lsblk mountpoint parsing returns empty.
 - 2026-02-06 17:31 EST (Codex): Baremetal detection now succeeds via /boot/efi -> PKNAME; added sudo prompt (sudo -v) and sudo blockdev for disk size to avoid permission errors.
 - 2026-02-06 17:41 EST (Codex): Fixed baremetal dataset path to /mnt/veyDisk/fedoraBackups/bareMetalImage and adjusted rm glob quoting to avoid zsh "no matches found".
+- 2026-02-06 17:48 EST (Codex): Replaced remote rm glob with find -delete to avoid zsh nonomatch errors when directory is empty.
