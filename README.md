@@ -120,6 +120,8 @@ The problems section will describe, in the order in which they need solving, the
 
 We must first determine *how* we will get macOS back on this mac mini. Most likely method is via recovery, so the reinstallation is likely to wipe the entire internal storage, as well as use the entire internal storage itself. 
 
+Target macOS size (if reinstall does not require a full wipe): **200 GB** to cover OS + Office + 100 GB spare. (Codex, 2026-02-06 06:25 EST)
+
 #### Tasks
 
 1. Answer the following preliminary questions:
