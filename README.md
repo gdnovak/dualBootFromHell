@@ -86,6 +86,10 @@ The following are hardware, software, or systems that we have at our immediate d
         - the homelab is crippled at the moment as I've been too lazy to activate the other two nodes (older razer and ancient macbook air)
         - it is currently just the 2017 razer blade running proxmox, which runs trueNAS. This is connected to a smart switch by ethernet, as is the mac-mini, which connects both to the internet via ethernet port on the wall. The, modem/main router is inaccessible, as I live with my parents. It is not impossible to work with, but requires permission and extra precautions, since their data is worth far more than mine, I'd imagine.
 
+### Resumable Baremetal Imaging (ddrescue)
+
+If the full-disk image is interrupted (power flicker, window closed, network drop), standard `dd` cannot resume. A `ddrescue`-based mode can create a **resume mapfile** so the imaging can continue from where it left off. This is optional but recommended for large one-time images over the network. (Codex, 2026-02-06 17:36 EST)
+
 
 ### How to Read My Writing
 
@@ -137,6 +141,11 @@ Target macOS size (if reinstall does not require a full wipe): **300 GB** to cov
     2.3 Determine whether backup is sufficient to restore fully functional "copy" of my current system.
         2.3.4 If backup is insufficient, determine new method, return to 2.2. Otherwise proceed to 2.3.5
         2.3.5 If backup and restore work to our liking, determine whether dualboot requires any installations PRIOR to MacOS install. If yes, do so now.
+
+### Optional Optimizations (Not Required)
+
+- Add a **resumable** baremetal imaging mode using `ddrescue` with a mapfile so interrupted runs can continue.
+- Upgrade to **2.5/5/10 GbE** adapters (both ends) for much faster backups.
 
 ### Problem 2. Reinstallation of MacOS
 
