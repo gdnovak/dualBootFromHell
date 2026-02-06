@@ -16,3 +16,4 @@
 - 2026-02-06 14:17 EST (Codex): User updated target macOS size to 300 GB (supersedes 200 GB). README update pending user approval per instruction.
 - 2026-02-06 15:17 EST (Codex): Updated /home/tdj/bin/rsync_to_truenas.sh to use SSH host alias "truenas" (new key) instead of a hardcoded key path; no changes needed to the TrueNAS Backup Now desktop entry.
 - 2026-02-06 15:31 EST (Codex): Added baremetal option (3) to /home/tdj/bin/rsync_to_truenas.sh. It prompts for confirmation, asks for source disk, clears /mnt/veyDisk/fedoraBackups/baremetalImage, and streams a full-disk image to NAS.
+- 2026-02-06 15:40 EST (Codex): Fixed rsync_to_truenas.sh to use explicit IP/user and absolute key/known_hosts paths so sudo rsync uses the correct SSH identity (host alias was not available under sudo).
