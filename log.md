@@ -32,3 +32,4 @@
 - 2026-02-06 17:41 EST (Codex): Fixed baremetal dataset path to /mnt/veyDisk/fedoraBackups/bareMetalImage and adjusted rm glob quoting to avoid zsh "no matches found".
 - 2026-02-06 17:48 EST (Codex): Replaced remote rm glob with find -delete to avoid zsh nonomatch errors when directory is empty.
 - 2026-02-06 17:36 EST (Codex): Added README sections for resumable baremetal imaging (ddrescue) and optional optimizations list.
+- 2026-02-06 18:20 EST (Codex): Baremetal image completed successfully. Source: /dev/nvme0n1. Destination: /mnt/veyDisk/fedoraBackups/bareMetalImage/macmini-2018-baremetal-2026-02-06_16-59-43.img. Size copied: 500,296,581,120 bytes (466 GiB). Duration ~4826s @ ~104 MB/s.
