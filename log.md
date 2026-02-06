@@ -13,3 +13,4 @@
 - 2026-02-06 00:33 EST (Codex): GitHub auth fixed by switching to SSH; `ssh -T git@github.com` succeeded. Test file `deleteIfYouSee.md` was created, committed, pushed, deleted on GitHub, and local repo synced via `git pull --ff-only`. Repository sync workflow confirmed working.
 - 2026-02-06 00:46 EST (Codex): If MacOS reinstall does **NOT** require a *full* wipe, plan path is: backup + restore test first, then shrink Fedora (LUKS+Btrfs) to free space, then install macOS into new APFS space via Recovery, then fix boot flow. No changes executed yet.
 - 2026-02-06 06:25 EST (Codex): Added target macOS size to README.md: 200 GB (OS + Office + 100 GB spare).
+- 2026-02-06 14:17 EST (Codex): User updated target macOS size to 300 GB (supersedes 200 GB). README update pending user approval per instruction.
