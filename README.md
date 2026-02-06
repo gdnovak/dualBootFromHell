@@ -12,6 +12,22 @@ Our goal is to dual-boot MacOS and Fedora KDE Plasma on a 2018 Mac Mini, where M
 
 The following are the specifications of the computer we are working with:
 
+ - Model: Apple Mac mini (Macmini8,1, 2018)
+ - CPU: Intel Core i7-8700B (6 cores / 12 threads)
+ - RAM: 16 GiB
+ - GPU: Intel UHD Graphics 630
+ - T2: Apple iBridge (T2 present)
+ - Storage: Apple NVMe SSD 512 GB (APPLE SSD AP0512M)
+ - OS: Fedora Linux 43 (KDE Plasma Desktop Edition), Wayland
+ - Kernel: 6.18.7-210.t2.fc43.x86_64
+ - Firmware: Apple 2092.0.0.0.0 (iBridge 23.16.10350.0.0,0), 2025-08-05
+ - Bootloader: GRUB 2.12 (systemd-boot not installed)
+ - Secure Boot: disabled
+ - Disk layout (internal): EFI (/boot/efi, vfat), /boot (ext4), LUKS -> Btrfs (root + /home subvols; label "fedora")
+ - Network: Broadcom BCM4364 Wi-Fi, Broadcom BCM57766 GbE
+ - Thunderbolt: Titan Ridge + Alpine Ridge controllers present
+ 
+ (Codex, 2026-02-06 00:17 EST)
 
 
 ### Available Hardware/Software
@@ -20,7 +36,7 @@ The following are hardware, software, or systems that we have at our immediate d
 
 - Hardware
     - Mac Mini
-        - {FILL IN SPECS HERE - delete this line and add bullet points, indented appropriately}
+        - See "System Specs" above for full details. (Codex, 2026-02-06 00:17 EST)
     - 64GB USB drive
         - needs formatting, has fedora live WS on it, but so does the bigger Ventoy drive below
         - this is tentatively what we will backup our system to, as it appears my entire OS + all downloaded / created data is about 30-40GB (I also trust Sandisk more than Gigastone, maker of next item)
@@ -147,4 +163,3 @@ Not sure whether codex may be installed again at this step, but will try if poss
     1.2 If necessary install blank slate Fedora KDE Plasma
 2. Restore from backup
    
-
