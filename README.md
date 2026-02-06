@@ -141,6 +141,7 @@ Target macOS size (if reinstall does not require a full wipe): **300 GB** to cov
     2.3 Determine whether backup is sufficient to restore fully functional "copy" of my current system.
         2.3.4 If backup is insufficient, determine new method, return to 2.2. Otherwise proceed to 2.3.5
         2.3.5 If backup and restore work to our liking, determine whether dualboot requires any installations PRIOR to MacOS install. If yes, do so now.
+    2.4 Define a reliable method to access the baremetal image (e.g., SSH/SCP, SMB/NFS share, or SSHFS mount) for restore operations. (Codex, 2026-02-06 18:27 EST)
 
 ### Optional Optimizations (Not Required)
 
