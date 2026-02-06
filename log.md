@@ -24,3 +24,4 @@
 - 2026-02-06 16:18 EST (Codex): Fixed baremetal auto-detection to handle /dev/mapper root sources by querying lsblk on the mapper device.
 - 2026-02-06 16:26 EST (Codex): Improved baremetal auto-detect: strip btrfs subvol suffix, prefer /boot/efi device to identify disk, then fall back to root mapper.
 - 2026-02-06 16:35 EST (Codex): Fixed baremetal auto-detect to walk parent devices to the top-level disk (avoids selecting partition like nvme0n1p3).
+- 2026-02-06 16:46 EST (Codex): Reworked baremetal auto-detect to climb to top-level disk by device type and prefer /boot/efi or /boot mount sources.
