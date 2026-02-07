@@ -43,4 +43,5 @@
 - 2026-02-06 23:41 EST (Codex): SSH auth failure root cause likely key mismatch: ~/.ssh/config host `truenas` uses id_ed25519_truenas, while a new automation key id_ed25519_buAuto was generated. Next step is add matching pubkey to TrueNAS user or update SSH config identity.
 - 2026-02-06 23:48 EST (Codex): TrueNAS root check showed `/etc/sudoers.d/99-codex-temp` exists but `sudo -l -U macmini_bu` still denies sudo; likely sudoers include path mismatch (TrueNAS may be using `/usr/local/etc/sudoers*` instead of `/etc/sudoers*`).
 - 2026-02-07 00:32 EST (Codex): Provided root SSH rollback commands (remove root authorized_keys and disable root SSH login via TrueNAS settings/CLI) before user pause for the night.
+- 2026-02-07 15:48 EST (Codex): Created `fThisPlan.md` with non-hand-rolled backup alternatives (Vorta/Borg, Back In Time, Restic, Timeshift, Deja Dup), Fedora package availability notes, and a \"tonight\" path focused on restoring project momentum toward dual boot.
 - 2026-02-06 18:27 EST (Codex): Added README task to define a reliable access method for the baremetal image during restore.
