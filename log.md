@@ -39,4 +39,5 @@
 - 2026-02-06 23:10 EST (Codex): Security direction: create dedicated SSH automation user for backup datasets with least privilege (dataset-scoped commands, restricted SSH key options), avoiding broad sudo/root.
 - 2026-02-06 23:28 EST (Codex): User requested direct Codex-operated TrueNAS config due fatigue; proposed temporary passwordless sudo access for an SSH key (time-boxed, then revoke) so Codex can execute shell tasks end-to-end.
 - 2026-02-06 23:36 EST (Codex): First temporary sudoers attempt still prompted for password over SSH; next step is enforce explicit `Defaults:macmini_bu !authenticate` and re-test with `ssh truenas 'sudo -n id'`.
+- 2026-02-06 23:40 EST (Codex): Here-doc commands for sudoers setup proved fragile in TrueNAS shell; switching to single-line `printf | sudo tee` commands to avoid paste/newline parsing issues.
 - 2026-02-06 18:27 EST (Codex): Added README task to define a reliable access method for the baremetal image during restore.
