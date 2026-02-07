@@ -42,4 +42,5 @@
 - 2026-02-06 23:40 EST (Codex): Here-doc commands for sudoers setup proved fragile in TrueNAS shell; switching to single-line `printf | sudo tee` commands to avoid paste/newline parsing issues.
 - 2026-02-06 23:41 EST (Codex): SSH auth failure root cause likely key mismatch: ~/.ssh/config host `truenas` uses id_ed25519_truenas, while a new automation key id_ed25519_buAuto was generated. Next step is add matching pubkey to TrueNAS user or update SSH config identity.
 - 2026-02-06 23:48 EST (Codex): TrueNAS root check showed `/etc/sudoers.d/99-codex-temp` exists but `sudo -l -U macmini_bu` still denies sudo; likely sudoers include path mismatch (TrueNAS may be using `/usr/local/etc/sudoers*` instead of `/etc/sudoers*`).
+- 2026-02-07 00:32 EST (Codex): Provided root SSH rollback commands (remove root authorized_keys and disable root SSH login via TrueNAS settings/CLI) before user pause for the night.
 - 2026-02-06 18:27 EST (Codex): Added README task to define a reliable access method for the baremetal image during restore.
