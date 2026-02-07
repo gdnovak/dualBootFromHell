@@ -45,3 +45,4 @@
 - 2026-02-07 00:32 EST (Codex): Provided root SSH rollback commands (remove root authorized_keys and disable root SSH login via TrueNAS settings/CLI) before user pause for the night.
 - 2026-02-07 15:48 EST (Codex): Created `fThisPlan.md` with non-hand-rolled backup alternatives (Vorta/Borg, Back In Time, Restic, Timeshift, Deja Dup), Fedora package availability notes, and a \"tonight\" path focused on restoring project momentum toward dual boot.
 - 2026-02-06 18:27 EST (Codex): Added README task to define a reliable access method for the baremetal image during restore.
+- 2026-02-07 15:56 EST (Codex): Expanded `fThisPlan.md` with KDE-native `kbackup` option and reference links (official docs + Fedora package pages) to support quick selection tonight.

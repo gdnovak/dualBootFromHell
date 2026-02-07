@@ -39,6 +39,12 @@ Local package query only surfaced `mariadb-backup` from backup-related names.
 - Strength: Lowest setup friction
 - Tradeoff: Less flexible for advanced Linux layout use-cases
 
+6. KBackup (`kbackup`)
+- Type: KDE-native simple backup GUI
+- Good for: Fast, simple file backups inside KDE ecosystem
+- Strength: Familiar KDE tool with low setup friction
+- Tradeoff: Simpler archive model; not as robust as Borg/Restic for long-term policy automation
+
 ## Fedora Availability (checked locally)
 Available packages include:
 - `vorta`, `borgbackup`, `restic`, `timeshift`, `deja-dup`, `backintime-qt`, `snapper`
@@ -73,3 +79,18 @@ sudo dnf install -y restic
 - Removes fragile shell glue for rotation/retention logic.
 - Gives tested restore workflows and predictable behavior.
 - Keeps project scope aligned with the actual goal (dual boot).
+
+## References
+- BorgBackup official site: https://www.borgbackup.org/
+- Borg docs: https://borgbackup.readthedocs.io/
+- Vorta project/docs: https://vorta.borgbase.com/
+- Restic docs: https://restic.readthedocs.io/
+- Fedora package for restic: https://packages.fedoraproject.org/pkgs/restic/restic/
+- Back In Time docs: https://backintime-docs.readthedocs.io/
+- Fedora package for backintime-qt: https://packages.fedoraproject.org/pkgs/backintime/backintime-qt/
+- Timeshift upstream: https://github.com/linuxmint/timeshift
+- Fedora package for timeshift: https://packages.fedoraproject.org/pkgs/timeshift/timeshift
+- Déjà Dup (GNOME app): https://apps.gnome.org/en-GB/DejaDup/
+- Fedora package for deja-dup: https://packages.fedoraproject.org/pkgs/deja-dup/deja-dup/
+- Fedora package for vorta: https://packages.fedoraproject.org/pkgs/vorta/vorta
+- Fedora package for kbackup: https://packages.fedoraproject.org/pkgs/kbackup/kbackup
