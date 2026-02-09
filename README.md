@@ -139,9 +139,56 @@ Target macOS size (if reinstall does not require a full wipe): **300 GB** to cov
     2.1 Make complete backup using script method (mentioned in software)
     2.2 Test this backup somehow. TBD. I assume via rescuezilla or fedora workstation. Need advice here.
     2.3 Determine whether backup is sufficient to restore fully functional "copy" of my current system.
-        2.3.4 If backup is insufficient, determine new method, return to 2.2. Otherwise proceed to 2.3.5
+    2.3.4 If backup is insufficient, determine new method, return to 2.2. Otherwise proceed to 2.3.5
         2.3.5 If backup and restore work to our liking, determine whether dualboot requires any installations PRIOR to MacOS install. If yes, do so now.
     2.4 Define a reliable method to access the baremetal image (e.g., SSH/SCP, SMB/NFS share, or SSHFS mount) for restore operations. (Codex, 2026-02-06 18:27 EST)
+
+#### Checkpoint Summary (What We Actually Did)
+
+1. Planning and decision checkpoints
+    1.1.1 Confirmed target split goal: keep Fedora and reinstall macOS with a 300 GB target partition.
+    1.1.2 Decided to keep both backup styles:
+        - file-level for regular rollback/restore workflows
+        - baremetal image for worst-case full-disk recovery
+    1.1.3 Shifted architecture away from one monolithic backup script toward:
+        - Fedora-side backup jobs (manual + automated)
+        - TrueNAS-side archive/rotation job
+
+2. Backup pipeline implementation
+    2.1.1 Standardized primary script in repo: `scripts/rsync_to_truenas.sh` (launcher wrapper remains at `~/bin/rsync_to_truenas.sh`).
+    2.1.2 Standardized modes:
+        - `2` = complete-manual
+        - `3` = baremetal
+        - `4` = complete-auto
+    2.1.3 Implemented file-level slot behavior:
+        - SSD recent slots at `/mnt/veyDisk/fedoraBackups/completeFileLevel/recent/{01,02,03}`
+        - mode `2` rotates manual slot `01 -> 02`, then writes new backup to `01`
+        - mode `4` writes to `03`
+    2.1.4 Implemented baremetal safer write flow:
+        - detect source disk automatically
+        - write to `.incoming-<timestamp>.img`
+        - promote to final image only after successful transfer
+        - store under `/mnt/veyDisk/fedoraBackups/bareMetalImage/current`
+    2.1.5 Added metadata generation for backups (`backup_info.md`, mount/block/package captures by mode/path).
+
+3. Automation and orchestration
+    3.1.1 Fedora automation configured:
+        - systemd user timer `truenas-filelevel-auto.timer` scheduled daily at 03:30
+        - `loginctl enable-linger tdj` enabled so timer runs when user is logged out
+    3.1.2 TrueNAS archive automation configured:
+        - root cron job (daily 04:30) runs `/root/truenas_archive_rotate.sh`
+        - archive script moves/copies from SSD backup datasets into HDD archive datasets by slot policy
+    3.1.3 Proxmox/TrueNAS management path fixed for low-friction ops:
+        - VM 100 guest-agent + serial path enabled
+        - `qm guest exec` now usable for command execution in TrueNAS guest
+
+4. Validation checkpoint completed
+    4.1.1 Manual file-level backup (`mode 2`) executed successfully after dataset permission correction.
+    4.1.2 Automated file-level path (`mode 4`) executed and archive rotation script populated HDD archive targets.
+    4.1.3 Baremetal image presence and sizing verified:
+        - apparent file size remains full-disk scale (~466 GiB)
+        - ZFS allocated usage appears much lower (~31-32 GiB) due sparse/zero-heavy data and reservation behavior
+    4.1.4 Current status: backup automation and archive automation are configured and active; next major stage is restore testing before macOS reinstall. (Codex, 2026-02-09 00:38 EST)
 
 ### Optional Optimizations (Not Required)
 
