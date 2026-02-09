@@ -211,6 +211,7 @@ rotate_manual_slots() {
 run_filelevel_backup() {
   local target_slot="$1"
   local backup_kind="$2"
+  local can_use_sudo=1
 
   echo "=== File-level backup started: $STAMP ($backup_kind) ===" | tee -a "$LOGFILE"
   run_ssh "mkdir -p '$target_slot/data' '$target_slot/meta'"
@@ -220,8 +221,18 @@ run_filelevel_backup() {
     rotate_manual_slots
   fi
 
-  echo "Escalating privileges for system paths (sudo)..." | tee -a "$LOGFILE"
-  sudo -v
+  if [[ "$backup_kind" == "complete-auto" ]]; then
+    if sudo -n true 2>/dev/null; then
+      echo "Auto mode: non-interactive sudo is available; including system paths." | tee -a "$LOGFILE"
+    else
+      can_use_sudo=0
+      echo "Auto mode: non-interactive sudo unavailable; backing up user-space paths only." | tee -a "$LOGFILE"
+      echo "Run mode 2 periodically to capture full system-state paths (/etc, /var, /boot)." | tee -a "$LOGFILE"
+    fi
+  else
+    echo "Escalating privileges for system paths (sudo)..." | tee -a "$LOGFILE"
+    sudo -v
+  fi
 
   local home_excludes=()
   for ex in "${BASE_EXCLUDES[@]}"; do
@@ -234,43 +245,45 @@ run_filelevel_backup() {
     "$HOME/" \
     "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/home/"
 
-  run_rsync sudo rsync \
-    "${RSYNC_COMMON_OPTS[@]}" \
-    /etc/ \
-    "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/etc/"
-
-  run_rsync sudo rsync \
-    "${RSYNC_COMMON_OPTS[@]}" \
-    /var/lib/ \
-    "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_lib/"
-
-  run_rsync sudo rsync \
-    "${RSYNC_COMMON_OPTS[@]}" \
-    /var/log/ \
-    "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_log/"
-
-  run_rsync sudo rsync \
-    "${RSYNC_COMMON_OPTS[@]}" \
-    /var/spool/ \
-    "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_spool/"
-
-  run_rsync sudo rsync \
-    "${RSYNC_COMMON_OPTS[@]}" \
-    /boot/ \
-    "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/boot/"
-
-  if [[ -d /usr/local ]]; then
+  if [[ "$can_use_sudo" -eq 1 ]]; then
     run_rsync sudo rsync \
       "${RSYNC_COMMON_OPTS[@]}" \
-      /usr/local/ \
-      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/usr_local/"
-  fi
+      /etc/ \
+      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/etc/"
 
-  if [[ -d /opt ]]; then
     run_rsync sudo rsync \
       "${RSYNC_COMMON_OPTS[@]}" \
-      /opt/ \
-      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/opt/"
+      /var/lib/ \
+      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_lib/"
+
+    run_rsync sudo rsync \
+      "${RSYNC_COMMON_OPTS[@]}" \
+      /var/log/ \
+      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_log/"
+
+    run_rsync sudo rsync \
+      "${RSYNC_COMMON_OPTS[@]}" \
+      /var/spool/ \
+      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/var_spool/"
+
+    run_rsync sudo rsync \
+      "${RSYNC_COMMON_OPTS[@]}" \
+      /boot/ \
+      "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/boot/"
+
+    if [[ -d /usr/local ]]; then
+      run_rsync sudo rsync \
+        "${RSYNC_COMMON_OPTS[@]}" \
+        /usr/local/ \
+        "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/usr_local/"
+    fi
+
+    if [[ -d /opt ]]; then
+      run_rsync sudo rsync \
+        "${RSYNC_COMMON_OPTS[@]}" \
+        /opt/ \
+        "$TRUENAS_USER@$TRUENAS_HOST:$target_slot/data/opt/"
+    fi
   fi
 
   write_filelevel_metadata "$target_slot" "$backup_kind"
