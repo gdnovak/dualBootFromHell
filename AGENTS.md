@@ -7,8 +7,9 @@
 
 ## Speed-First Policy
 
-- Quick is default. Prefer the fastest safe path that completes the task.
+- Quick is default. Prefer the fastest path that completes the task.
 - If permission/tooling blocks progress, immediately state the fastest path to unblock.
+- For tasks expected to run long, spawn subagents to parallelize and avoid blocking the main thread.
 
 ## Time Allowance Rule
 
