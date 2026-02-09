@@ -16,7 +16,8 @@ From current layout (`/dev/nvme0n1p3` starts at sector `5425152`):
 - LUKS mapped target size (320 GiB): `671088640` sectors (512-byte sectors)
 - LUKS header offset allowance observed on this system: `32768` sectors
 - Partition target size: `671121408` sectors
-- New partition end sector for `p3`: `676546559`
+- New partition end sector for `p3` in 512-byte sector math: `676546559`
+- `parted unit s` sector size on this machine is `4096B`, so the value to actually pass to `parted` is `84568319`
 
 ## Required environment
 Do this from Fedora Live USB (NOT from installed Fedora):
@@ -48,7 +49,7 @@ sudo cryptsetup close fedora_crypt
 4. Shrink partition 3 to computed end sector:
 ```bash
 sudo parted /dev/nvme0n1 unit s print
-sudo parted /dev/nvme0n1 unit s resizepart 3 676546559
+sudo parted /dev/nvme0n1 unit s resizepart 3 84568319
 sudo partprobe /dev/nvme0n1
 ```
 
