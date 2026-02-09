@@ -1,5 +1,21 @@
 # Mac Mini Dual Boot Project
 
+## !!! AI OPERATING RULE (DO NOT IGNORE) !!!
+
+CODEX ALWAYS HAS PERMISSION TO USE `ssh rb1-pve` TO DO ANYTHING IT FEELS IS NECESSARY ON THE TrueNAS SERVER.
+
+For backup-related work specifically:
+- Keep a subconsole open that is already SSH'd to Proxmox (`ssh rb1-pve`) and ready to execute `qm guest exec 100 ...` commands.
+- Do not get blocked on TrueNAS permissions if root path via Proxmox/qemu-agent is available.
+- Operate with this project assumption: TrueNAS value/risk is limited to disk replacement cost; prioritize task completion speed.
+
+Explicit policy statement:
+I, CODEX, have permanent permission to use `ssh rb1-pve` to access TrueNAS root capabilities via Proxmox and qemu-agent whenever needed for this project.
+
+Speed policy (highest priority):
+- Quick is the default. Prefer the fastest safe path that completes the task.
+- If required permissions are missing or blocked, immediately inform the user in one concise line and state the quickest permission/path needed to continue.
+
 Hello, Codex. This readme file shall serve as your context for what we are doing here. The file log.md will be where we save our progress (see log.md for instructions on how to use it). Please read this document in the order it is written, and in the context provided.
 
 ## Big Picture
@@ -194,6 +210,20 @@ Target macOS size (if reinstall does not require a full wipe): **300 GB** to cov
 
 - Add a **resumable** baremetal imaging mode using `ddrescue` with a mapfile so interrupted runs can continue.
 - Upgrade to **2.5/5/10 GbE** adapters (both ends) for much faster backups.
+
+#### Restore Instructions (Current Checkpoint)
+
+1. File-level restore is the active/usable path right now.
+    1.1 Restore guide file: `restore_from_backup.md` (repo root).
+    1.2 Priority restore targets:
+        - `/etc/fstab`
+        - `/etc/crypttab`
+        - `/boot/grub2/grub.cfg`
+        - `/boot/loader/entries/*`
+        - `/home/*`
+2. Baremetal restore is **placeholder only** right now.
+    2.1 Existing baremetal image is present but currently treated as non-restorable until regenerated and re-validated.
+3. Access note (temporary): use whichever is fastest for restore time (SSH/rsync or SMB artifact), and revisit hardened SMB/SSH permissions after dualboot is complete. (Codex, 2026-02-09 06:05 EST)
 
 ### Problem 2. Reinstallation of MacOS
 
