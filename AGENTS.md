@@ -1,15 +1,23 @@
 # AGENTS Rules (Project-Local)
 
+## !!! CRITICAL EXECUTION DIRECTIVE !!!
+
+- Primary project objective for this phase: **quickly** finalize backup/recovery path, resize Fedora, and complete macOS+Fedora dualboot.
+- Deadline priority: deliver working dualboot **tonight**.
+- Do not allow low-value detours to delay this objective.
+
 ## Scope
 
 - Do not fundamentally alter project scope.
-- Scope is: get macOS + Fedora dualboot working quickly and safely enough for user priorities.
+- Scope is: get macOS + Fedora dualboot working quickly for user priorities.
 
 ## Speed-First Policy
 
 - Quick is default. Prefer the fastest path that completes the task.
 - If permission/tooling blocks progress, immediately state the fastest path to unblock.
-- For tasks expected to run long, spawn subagents to parallelize and avoid blocking the main thread.
+- Spawn subagents whenever that is expected to reduce wall-clock completion time.
+- Parallelize independent work aggressively.
+- Do not hold the main thread waiting on long subagent tasks unless their output is required to proceed.
 
 ## Time Allowance Rule
 
@@ -28,6 +36,7 @@ Ask before operations that could:
 - Codex has standing permission to use `ssh rb1-pve` for any necessary TrueNAS work.
 - For backup/TrueNAS tasks, prefer a ready Proxmox path and run TrueNAS root actions via `qm guest exec 100 ...` when needed.
 - Do not get stuck on non-root TrueNAS permission friction if Proxmox root path is available.
+- Creating helper VMs on Proxmox for acceleration/orchestration is permitted when it is faster than alternatives.
 
 ## Git Rule
 
