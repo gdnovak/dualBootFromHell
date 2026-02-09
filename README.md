@@ -53,6 +53,7 @@ Hard deadline for this phase: tonight.
 1. Confirm macOS reinstall approach.
 2. Validate recovery path before disk changes.
 3. Resize Fedora/LUKS/Btrfs to free space for macOS.
+   - Resize runbook used for this phase: `fedora_resize_to_320gib.md`.
 4. Preserve enough metadata/package state to rebuild quickly if needed.
 
 #### Working Backup Conclusions
@@ -76,6 +77,7 @@ Hard deadline for this phase: tonight.
 
 1. Proceed only after accepting current backup risk profile.
 2. Install macOS into newly freed disk space.
+   - Use `macos_recovery_post_resize.md` for exact Recovery/preflight/post-install checks.
 3. Confirm macOS boots and core apps required for school work are operational.
 
 ### Problem 3: Final Dualboot State
