@@ -1,254 +1,89 @@
 # Mac Mini Dual Boot Project
 
-## !!! AI OPERATING RULE (DO NOT IGNORE) !!!
+## Overview
 
-CODEX ALWAYS HAS PERMISSION TO USE `ssh rb1-pve` TO DO ANYTHING IT FEELS IS NECESSARY ON THE TrueNAS SERVER.
+Goal: dual-boot macOS and Fedora KDE Plasma on a 2018 Mac mini while preserving the current Fedora setup enough to recover quickly if needed.
 
-For backup-related work specifically:
-- Keep a subconsole open that is already SSH'd to Proxmox (`ssh rb1-pve`) and ready to execute `qm guest exec 100 ...` commands.
-- Do not get blocked on TrueNAS permissions if root path via Proxmox/qemu-agent is available.
-- Operate with this project assumption: TrueNAS value/risk is limited to disk replacement cost; prioritize task completion speed.
+Current priority: complete disk resize and macOS reinstall path quickly.
 
-Explicit policy statement:
-I, CODEX, have permanent permission to use `ssh rb1-pve` to access TrueNAS root capabilities via Proxmox and qemu-agent whenever needed for this project.
+## Current Status
 
-Speed policy (highest priority):
-- Quick is the default. Prefer the fastest safe path that completes the task.
-- If required permissions are missing or blocked, immediately inform the user in one concise line and state the quickest permission/path needed to continue.
+- Fedora currently occupies nearly the full internal SSD.
+- File-level backup/automation is working and usable for rapid reinstall/config recovery.
+- Existing baremetal image is currently treated as non-restorable until regenerated and validated.
+- A resize guide exists: `fedora_resize_to_320gib.md`.
 
-Hello, Codex. This readme file shall serve as your context for what we are doing here. The file log.md will be where we save our progress (see log.md for instructions on how to use it). Please read this document in the order it is written, and in the context provided.
+## System Specs
 
-## Big Picture
+- Model: Apple Mac mini (Macmini8,1, 2018)
+- CPU: Intel Core i7-8700B (6 cores / 12 threads)
+- RAM: 16 GiB
+- GPU: Intel UHD Graphics 630
+- T2: Apple iBridge (T2 present)
+- Storage: Apple NVMe SSD 512 GB (APPLE SSD AP0512M)
+- OS: Fedora Linux 43 KDE Plasma
+- Kernel: `6.18.7-210.t2.fc43.x86_64`
+- Bootloader: GRUB 2.12
+- Internal layout: EFI (`/boot/efi`, vfat), `/boot` (ext4), LUKS -> Btrfs (`/root`, `/home` subvols)
 
-Our goal is to dual-boot MacOS and Fedora KDE Plasma on a 2018 Mac Mini, where MacOS was previously deleted in favor of letting Fedora have the entire internal storage (~450GB), and where we want to preserve my fedora kde plasma and all of its files in the process.
+## Environment Inventory
 
-## Context & Background
+### Hardware
 
-### System Specs
+- Mac mini (project machine)
+- 64 GB USB drive
+- 256 GB Ventoy USB (includes Fedora live + Rescuezilla)
+- 2020 MacBook Pro (no wipe)
+- 2015 Razer Blade (optional test machine)
+- 2 TB external SSD on TrueNAS (`veyDisk`)
+- 5 TB external HDD on TrueNAS (`oyPool`)
 
-The following are the specifications of the computer we are working with:
+### Software/Systems
 
- - Model: Apple Mac mini (Macmini8,1, 2018)
- - CPU: Intel Core i7-8700B (6 cores / 12 threads)
- - RAM: 16 GiB
- - GPU: Intel UHD Graphics 630
- - T2: Apple iBridge (T2 present)
- - Storage: Apple NVMe SSD 512 GB (APPLE SSD AP0512M)
- - OS: Fedora Linux 43 (KDE Plasma Desktop Edition), Wayland
- - Kernel: 6.18.7-210.t2.fc43.x86_64
- - Firmware: Apple 2092.0.0.0.0 (iBridge 23.16.10350.0.0,0), 2025-08-05
- - Bootloader: GRUB 2.12 (systemd-boot not installed)
- - Secure Boot: disabled
- - Disk layout (internal): EFI (/boot/efi, vfat), /boot (ext4), LUKS -> Btrfs (root + /home subvols; label "fedora")
- - Network: Broadcom BCM4364 Wi-Fi, Broadcom BCM57766 GbE
- - Thunderbolt: Titan Ridge + Alpine Ridge controllers present
- 
- (Codex, 2026-02-06 00:17 EST)
+- Backup launcher script: `~/bin/rsync_to_truenas.sh`
+- Repo scripts: `scripts/rsync_to_truenas.sh`, `scripts/auto_filelevel_to_truenas.sh`, `scripts/truenas_archive_rotate.sh`
+- TrueNAS hosted in Proxmox (VMID `100`)
+- Proxmox alias: `ssh rb1-pve`
 
+## Problem Plan
 
-### Available Hardware/Software
+### Problem 1: Planning, Backup, and Testing
 
-The following are hardware, software, or systems that we have at our immediate disposal. I would prefer not to purchase anything, as it is night time and I'd like the system to be ready for school in the morning. Thus, assume this is *all* we have, and that I am not listing minutia like what cables are connected where (unnecessary for this project). The stuff:
+1. Confirm macOS reinstall approach.
+2. Validate recovery path before disk changes.
+3. Resize Fedora/LUKS/Btrfs to free space for macOS.
+4. Preserve enough metadata/package state to rebuild quickly if needed.
 
-- Hardware
-    - Mac Mini
-        - See "System Specs" above for full details. (Codex, 2026-02-06 00:17 EST)
-    - 64GB USB drive
-        - needs formatting, has fedora live WS on it, but so does the bigger Ventoy drive below
-        - this is tentatively what we will backup our system to, as it appears my entire OS + all downloaded / created data is about 30-40GB (I also trust Sandisk more than Gigastone, maker of next item)
-    - 256GB usb drive
-        - has Ventoy, with Fedora live WS, as well as rescuezilla, ubuntu-server, debian, and a few others. 
-        - preferably we use this as-is, but if extra space is needed we can swap the 64GB and 256GB drives' roles, as there is only about 40GB on the bigger one.
-    - Macbook Pro, 2020
-        - this can be used for ssh, testing backups, etc. It's a mac. We may NOT wipe this one, though.
-    - 2TB external SSD
-        - this is the only external drive I have larger than the 256GB USB drive
-        - It is currently connected to NAS system, would prefer not to use if unnecessary - only necessary if encryption prevents us from creating a usable backup and we need to simply clone the entire system.
-        - See "trueNas" in software section for more
-    - 5TB external HDD
-        - See "trueNas" in section below.
+#### Working Backup Conclusions
 
-- Software
-    - backups are handled with the script at path '/home/tdj/bin/rsync_to_truenas.sh'
-        - this is executed via taskbar shortcut for application "TrueNAS Backup Now"
-        - said application is titled "truenas_backup" (not sure exactly where it is)
-        - application (not the script itself) runs the following:
-        ```
-        -e bash -lc '$HOME/bin/rsync_to_truenas.sh; echo; echo '\''Done. Press Enter to close...'\''; read'
-        ```
-        - double check all of that for specificity, correct where needed, but the gist is that there's a shortcut leading to an application that utilizes the .sh script above
-        - The script sends backups to dataset on a local NAS, running TrueNAS
-        - **UNLESS WE DECIDE OTHERWISE, "BACKUP" REFERS TO A FINAL "complete" BACKUP MADE USING THIS SETUP**
-    - Ventoy with fedora live workstation and rescuezilla
-        - as previously mentioned, the 256GB usb drive is configured with Ventoy and has quite a few .iso's. If possible, we will either produce a .iso that it can load from my backups, or we will use one of its OS's to load our backup. 
-        - rescuezilla is semi-tested... as in I got it to begin a backup, but it was 450GB and estimated to take 2hrs, so I stopped it 2% done. Rescuezilla may be considered our backup backup here.
-    - TrueNAS
-        - there is an external computer on the local network running ProxMox with TrueNAS and Tailscale. The tailscale node is broken, but truenas is working fine, and is its main purpose. 
-        - this is where the backups go, to dataset on "veyDisk" titled fedoraBackups. The script uses SSH and rSync to make backups. I likely need not explain the script to you, since the path was provided. "veyDisk" is the name for the 2TB external SSD that we may need to use if neither the 64 nor 256 gb usb drives suffice. 
-        - The other disk on the nas is titled "oyPool" and it is a 5tb *3.5in hard drive*. Hence, more valuable data is stored on the 2TB "veyDisk", but because the 5tb disk has thus far been unproblematic, I am fine temporarily transferring the contents of veyDisk to oyPool in order to use it as an external drive for the mac mini.
-        - due to read/write speed, the 5tb disk is not an option for the final installation spot for Fedora.
-    - MacOS
-        - as previously mentioned, I have a 2020 Macbook Pro (intel). I also have a rather old (2015) Razer Blade that we can test the backups on (as in loading the os + restoring from backup). I'd prefer to use the razer, but if no data is being installed on the internal storage >60GB the Mac is fine. 
-        - *the* system we are using is a mac mini 2018, and its BIOS is thus (seemingly - haven't tested) capable of reinstalling MacOS. 
-    - {Fill in any other software you feel is relevant here}
-- *Systems*
-    - this is less of an inventory and more of a description of my setups
-    - The mac-mini is the workhorse and subject of our project 
-        - running fedora currently. 
-        - It is connected to ethernet, as well as a Dell WD19 hub, connecting it to the mouse, keyboard, two monitors, and the ventoy 256 usb drive. 
-        - The 64gb is plugged in directly. 
-        - A thunderbolt DP monitor is connected (three displays total), along with another USB hub in the thunderbolt ports. There is an open thunderbolt port on the mac itself, as well as the dell hub. There is one on the usb hub but not to be relied on.
-    - homelab
-        - the homelab is crippled at the moment as I've been too lazy to activate the other two nodes (older razer and ancient macbook air)
-        - it is currently just the 2017 razer blade running proxmox, which runs trueNAS. This is connected to a smart switch by ethernet, as is the mac-mini, which connects both to the internet via ethernet port on the wall. The, modem/main router is inaccessible, as I live with my parents. It is not impossible to work with, but requires permission and extra precautions, since their data is worth far more than mine, I'd imagine.
+1. File-level backup is currently the practical recovery path.
+2. Baremetal image is present but currently not trusted for restore.
+3. Keep moving forward with dualboot timeline; regenerate baremetal later if needed.
 
-### Resumable Baremetal Imaging (ddrescue)
+#### Restore Instructions (Current)
 
-If the full-disk image is interrupted (power flicker, window closed, network drop), standard `dd` cannot resume. A `ddrescue`-based mode can create a **resume mapfile** so the imaging can continue from where it left off. This is optional but recommended for large one-time images over the network. (Codex, 2026-02-06 17:36 EST)
+1. Use file-level restore path first.
+2. Priority restore targets:
+- `/etc/fstab`
+- `/etc/crypttab`
+- `/boot/grub2/grub.cfg`
+- `/boot/loader/entries/*`
+- `/home/*`
+3. Treat baremetal restore as unavailable until revalidated.
 
+### Problem 2: Reinstall macOS
 
-### How to Read My Writing
+1. Proceed only after accepting current backup risk profile.
+2. Install macOS into newly freed disk space.
+3. Confirm macOS boots and core apps required for school work are operational.
 
-#### How to read the "Problems" Section
+### Problem 3: Final Dualboot State
 
-The problems section will describe, in the order in which they need solving, the various "problems" involved in achieving our goal - where I mean "problems" in the sense of "exam problems" more than this is a currently problematic issue. However it may be. Due to the ambiguity of a general "to-do" list, I will do my best to mark my writing with the following tags:
+1. Ensure Fedora still boots after partition changes.
+2. Reinstall/repair Fedora only if necessary.
+3. Restore settings/data from file-level backup if required.
 
-- **General Definitions**:
-    - **priority** - When I write "priority" I mean importance to the project, to me. I do not mean it is to be done in any specific order.  
-        - In other words, high priority means that *I value* the results and the problem must be solved or task must be done in order for the project to meet expectations. 
-        - When I do not specify priority, decide for yourself
-        - If I specify *low priority* (either explicitly somewhere, or a tag indicates as such), then we may consider something to be unimportant to the final result.
-        - For example...
-            - ...backup integrity is of *high priority* to me because I am quite happy with my Fedora KDE Plasma setup as-is, and do not wish to reinstall everything. 
-            - ...of *low priority* is the efficiency of my truenas backups since that system is another project entirely, and tonight is not a great time to learn networking.
-    - You may interpret instructions "creatively" only where they are not explicitly stated. Example: If I say "X is Y" that means that "X is always Y" but that does not mean "X is not Z". 
-        - Think "all squares are rectangles" - you would not give me a 3x5in rectangle if asked for a square, but may give me a 3x3in square if asked for a rectangle. 
-        - **In general, assume that despite my inexperience with Linux and system administration, that I am very good at choosing my words.** Fun fact, since you are a language model at heart: I was raised by two lawyers. Specificity is like my sixth sense. 
+## Notes
 
-
-### How You (Codex) Are to Write
-
-- please mark changes to this document or the log with (Codex, [date and time added]). No need to overuse. If you, for example, write a long paragraph or add a large code block, and then explain said codeblock, a simple (codex, time/date) somewhere around there would help. 
-- Do not assume that I know anything other than the most basic of linux principles. I am very new to this, please explain what you are doing concisely, but do not prioritize explanations. For example, if you write "added ~/tdj/xyz to backup" do not assume I know what that directory is. Additionally I know **fuck-all** about BIOS and low-level systems, so please be sure to keep me informed.
-- Assume that my writing is always properly phrased, but recall that I am a human who just took his (prescribed) Klonopin for bedtime. (You can tell it's getting later as I write. Assume I wrote this top to bottom in chronological order, and scrutinize appropriately)
-
-## Problems 
-
-### Problem 1 - PLANNING, BACKUP AND TESTING
-
-#### preliminary
-
-We must first determine *how* we will get macOS back on this mac mini. Most likely method is via recovery, so the reinstallation is likely to wipe the entire internal storage, as well as use the entire internal storage itself. 
-
-Target macOS size (if reinstall does not require a full wipe): **300 GB** to cover OS + Office + 100 GB spare. (Codex, 2026-02-06 14:17 EST)
-
-#### Tasks
-
-1. Answer the following preliminary questions:
-- Is installing MacOS via recovery mode our only option (that does not involve purchasing a new copy of it)? **If not, stop work and discuss**
-    - I have another Mac on hand (2020 Macbook Pro) - would it help?
-- Answer the following if recovery mode is our best or the most feasible method of installing macos:
-    - When installing MacOS from recovery mode, *must* we wipe the entire disk?
-    - When installing MacOS from recovery mode, *must* it use the entirety of the internal storage?
-
-2. Testing backup
-    2.1 Make complete backup using script method (mentioned in software)
-    2.2 Test this backup somehow. TBD. I assume via rescuezilla or fedora workstation. Need advice here.
-    2.3 Determine whether backup is sufficient to restore fully functional "copy" of my current system.
-    2.3.4 If backup is insufficient, determine new method, return to 2.2. Otherwise proceed to 2.3.5
-        2.3.5 If backup and restore work to our liking, determine whether dualboot requires any installations PRIOR to MacOS install. If yes, do so now.
-    2.4 Define a reliable method to access the baremetal image (e.g., SSH/SCP, SMB/NFS share, or SSHFS mount) for restore operations. (Codex, 2026-02-06 18:27 EST)
-
-#### Checkpoint Summary (What We Actually Did)
-
-1. Planning and decision checkpoints
-    1.1.1 Confirmed target split goal: keep Fedora and reinstall macOS with a 300 GB target partition.
-    1.1.2 Decided to keep both backup styles:
-        - file-level for regular rollback/restore workflows
-        - baremetal image for worst-case full-disk recovery
-    1.1.3 Shifted architecture away from one monolithic backup script toward:
-        - Fedora-side backup jobs (manual + automated)
-        - TrueNAS-side archive/rotation job
-
-2. Backup pipeline implementation
-    2.1.1 Standardized primary script in repo: `scripts/rsync_to_truenas.sh` (launcher wrapper remains at `~/bin/rsync_to_truenas.sh`).
-    2.1.2 Standardized modes:
-        - `2` = complete-manual
-        - `3` = baremetal
-        - `4` = complete-auto
-    2.1.3 Implemented file-level slot behavior:
-        - SSD recent slots at `/mnt/veyDisk/fedoraBackups/completeFileLevel/recent/{01,02,03}`
-        - mode `2` rotates manual slot `01 -> 02`, then writes new backup to `01`
-        - mode `4` writes to `03`
-    2.1.4 Implemented baremetal safer write flow:
-        - detect source disk automatically
-        - write to `.incoming-<timestamp>.img`
-        - promote to final image only after successful transfer
-        - store under `/mnt/veyDisk/fedoraBackups/bareMetalImage/current`
-    2.1.5 Added metadata generation for backups (`backup_info.md`, mount/block/package captures by mode/path).
-
-3. Automation and orchestration
-    3.1.1 Fedora automation configured:
-        - systemd user timer `truenas-filelevel-auto.timer` scheduled daily at 03:30
-        - `loginctl enable-linger tdj` enabled so timer runs when user is logged out
-    3.1.2 TrueNAS archive automation configured:
-        - root cron job (daily 04:30) runs `/root/truenas_archive_rotate.sh`
-        - archive script moves/copies from SSD backup datasets into HDD archive datasets by slot policy
-    3.1.3 Proxmox/TrueNAS management path fixed for low-friction ops:
-        - VM 100 guest-agent + serial path enabled
-        - `qm guest exec` now usable for command execution in TrueNAS guest
-
-4. Validation checkpoint completed
-    4.1.1 Manual file-level backup (`mode 2`) executed successfully after dataset permission correction.
-    4.1.2 Automated file-level path (`mode 4`) executed and archive rotation script populated HDD archive targets.
-    4.1.3 Baremetal image presence and sizing verified:
-        - apparent file size remains full-disk scale (~466 GiB)
-        - ZFS allocated usage appears much lower (~31-32 GiB) due sparse/zero-heavy data and reservation behavior
-    4.1.4 Current status: backup automation and archive automation are configured and active; next major stage is restore testing before macOS reinstall. (Codex, 2026-02-09 00:38 EST)
-
-### Optional Optimizations (Not Required)
-
-- Add a **resumable** baremetal imaging mode using `ddrescue` with a mapfile so interrupted runs can continue.
-- Upgrade to **2.5/5/10 GbE** adapters (both ends) for much faster backups.
-
-#### Restore Instructions (Current Checkpoint)
-
-1. File-level restore is the active/usable path right now.
-    1.1 Restore guide file: `restore_from_backup.md` (repo root).
-    1.2 Priority restore targets:
-        - `/etc/fstab`
-        - `/etc/crypttab`
-        - `/boot/grub2/grub.cfg`
-        - `/boot/loader/entries/*`
-        - `/home/*`
-2. Baremetal restore is **placeholder only** right now.
-    2.1 Existing baremetal image is present but currently treated as non-restorable until regenerated and re-validated.
-3. Access note (temporary): use whichever is fastest for restore time (SSH/rsync or SMB artifact), and revisit hardened SMB/SSH permissions after dualboot is complete. (Codex, 2026-02-09 06:05 EST)
-
-### Problem 2. Reinstallation of MacOS
-
-#### preliminary
-
-DO NOT PROCEED TO THIS STEP UNTIL WE ARE CERTAIN THE BACKUP WORKED
-
-#### tasks
-
-1. Reinstall MacOS
-    1.1 CONFIRM BACKUP WAS MADE. CODEX WILL CEASE FUNCTION AT THIS POINT. using method determined in task 1, reinstall MacOS on system. 
-    1.2 Codex will no longer function on this system, so it will be opened remotely. I will enter what I am doing by hand - (unless you have an easier idea)
-2. configure MacOS (TBD - this may involve making the space we need for fedora on the internal storage, or simply configuring it as usual and rebooting...)
-3. This step is complete when we have a functioning MacOS installation on this system.
-
-### Problem 3 - DualBoot Fedora KDE Plasma
-
-#### preliminary
-
-Not sure whether codex may be installed again at this step, but will try if possible. I don't think it can on intel macs unless something has changed.
-
-#### tasks
-
-1. Configure Dualboot and Reinstall Fedora
-    1.1 If dualboot system was previously configured, skip. Otherwise, determine now how to dualboot fedora with macos. I will determine which OS gets how much space and where.
-    1.2 If necessary install blank slate Fedora KDE Plasma
-2. Restore from backup
-   
+- Optional optimization: resumable disk imaging (`ddrescue`) for future baremetal runs.
+- Optional optimization: 2.5/5/10 GbE upgrade for faster large backup jobs.
