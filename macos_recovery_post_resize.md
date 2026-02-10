@@ -11,7 +11,25 @@ Use this after Fedora has already been shrunk and verified bootable.
 
 1. Confirm Fedora is currently bootable and stable.
 2. Confirm backup risk is accepted for this phase (file-level path is primary; baremetal image is not currently trusted).
-3. Confirm you know how to reach Apple Startup Manager:
+3. Capture boot metadata + EFI snapshot for fast rollback/diff after macOS install:
+- Commands:
+```bash
+STAMP="$(date +%Y%m%d-%H%M%S)"
+OUT="$HOME/preflight_snapshots/$STAMP"
+mkdir -p "$OUT"
+
+sudo efibootmgr -v > "$OUT/efibootmgr-v.txt"
+lsblk -f > "$OUT/lsblk-f.txt"
+sudo blkid > "$OUT/blkid.txt"
+sudo cp -a /boot/efi/EFI "$OUT/EFI-backup"
+
+echo "Saved preflight snapshot at: $OUT"
+```
+- What this gives you:
+- `efibootmgr-v.txt`: UEFI/NVRAM boot entries before macOS changes defaults.
+- `lsblk-f.txt` and `blkid.txt`: exact device/UUID map for partition sanity checks.
+- `EFI-backup`: copy of Fedora/other EFI boot files for quick recovery reference.
+4. Confirm you know how to reach Apple Startup Manager:
 - Hold `Option` (Alt) immediately after power-on/chime.
 
 ## Recovery Install Steps

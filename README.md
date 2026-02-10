@@ -78,6 +78,7 @@ Hard deadline for this phase: tonight.
 1. Proceed only after accepting current backup risk profile.
 2. Install macOS into newly freed disk space.
    - Use `macos_recovery_post_resize.md` for exact Recovery/preflight/post-install checks.
+   - If working without live Codex, use `macos_install_solo_runbook.md` (single-guide path including "set default back to Fedora").
 3. Confirm macOS boots and core apps required for school work are operational.
 
 ### Problem 3: Final Dualboot State
