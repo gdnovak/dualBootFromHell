@@ -29,9 +29,29 @@ SSH_CMD=(
   -o UserKnownHostsFile="$KNOWN_HOSTS"
 )
 RSYNC_SSH="ssh -i $KEY_PATH -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$KNOWN_HOSTS"
+SUDO_KEEPALIVE_PID=""
 
 run_ssh() {
   "${SSH_CMD[@]}" "$TRUENAS_USER@$TRUENAS_HOST" "$@"
+}
+
+start_sudo_keepalive() {
+  sudo -v
+  (
+    while true; do
+      sleep 60
+      sudo -n true >/dev/null 2>&1 || exit 0
+    done
+  ) &
+  SUDO_KEEPALIVE_PID="$!"
+}
+
+stop_sudo_keepalive() {
+  if [[ -n "${SUDO_KEEPALIVE_PID:-}" ]]; then
+    kill "$SUDO_KEEPALIVE_PID" >/dev/null 2>&1 || true
+    wait "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+    SUDO_KEEPALIVE_PID=""
+  fi
 }
 
 format_duration() {
@@ -231,7 +251,7 @@ run_filelevel_backup() {
     fi
   else
     echo "Escalating privileges for system paths (sudo)..." | tee -a "$LOGFILE"
-    sudo -v
+    start_sudo_keepalive
   fi
 
   local home_excludes=()
@@ -394,7 +414,7 @@ run_baremetal_backup() {
   fi
 
   echo "Escalating privileges for disk access (sudo)..."
-  sudo -v
+  start_sudo_keepalive
   source_size_bytes="$(sudo blockdev --getsize64 "$source_dev")"
   source_size_human="$(numfmt --to=iec --suffix=B "$source_size_bytes")"
 
@@ -431,6 +451,7 @@ run_baremetal_backup() {
 }
 
 ensure_ssh_ready
+trap stop_sudo_keepalive EXIT
 
 case "$MODE" in
   complete-manual) run_filelevel_backup "$MANUAL_SLOT" "$MODE" ;;
