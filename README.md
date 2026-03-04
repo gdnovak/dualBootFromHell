@@ -4,6 +4,8 @@
 
 Goal: dual-boot macOS and Fedora KDE Plasma on a 2018 Mac mini while preserving the current Fedora setup enough to recover quickly if needed.
 
+Quick navigation: `DOCS-INDEX.md`
+
 Current priority: complete disk resize and macOS reinstall path quickly.
 Hard deadline for this phase: tonight.
 
