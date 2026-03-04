@@ -24,7 +24,7 @@ Purpose: quickest path to operating this repo without hunting through files.
   - `log.md` entries for `2026-02-22`
 
 ## Misc
-- `fThisPlan.md` - legacy planning scratch.
-- `mcp_or_not.md` - MCP planning note.
-- `skills_speed_report.md` - speed/skills planning note.
-
+- `archive/legacy/fThisPlan.md` - legacy planning scratch.
+- `archive/legacy/mcp_or_not.md` - MCP planning note.
+- `archive/legacy/skills_speed_report.md` - speed/skills planning note.
+- `archive/legacy/nas_report.txt` - historical NAS path/report snapshot.
