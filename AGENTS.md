@@ -1,5 +1,16 @@
 # AGENTS Rules (Project-Local)
 
+Status note (2026-03-04):
+- This file contains phase-era urgency rules from the original dualboot push window.
+- For current machine/network truth, use `cleanup-mar26/SYSTEMS-DIRECTORY-2026-03-03.md`.
+- For current repo operations, use `DOCS-INDEX.md`.
+
+## !!! CANONICAL TRUTH DIRECTIVE !!!
+
+- `~/cleanup-mar26/SYSTEMS-DIRECTORY-2026-03-03.md` is the canonical truth system for persistent lab facts.
+- If you change host naming or aliases, IPs, subnets, routes, VLANs, machine roles, storage layout, VM or service placement, access paths, persistent services, or any other operator-facing topology/network/layout fact, you MUST update that file in the same session when practical.
+- Do not leave the directory stale. Wrong infrastructure facts waste time and send later work in the wrong direction.
+
 ## !!! CRITICAL EXECUTION DIRECTIVE !!!
 
 - Primary project objective for this phase: **quickly** finalize backup/recovery path, resize Fedora, and complete macOS+Fedora dualboot.
@@ -33,7 +44,8 @@ Ask before operations that could:
 
 ## TrueNAS/Proxmox Access Rule
 
-- Codex has standing permission to use `ssh rb1-pve` for any necessary TrueNAS work.
+- Codex has standing permission to use `ssh rb2-pve` for necessary TrueNAS work in current topology.
+- Legacy alias `rb1-pve` is currently unreachable and should not be used for active operations.
 - For backup/TrueNAS tasks, prefer a ready Proxmox path and run TrueNAS root actions via `qm guest exec 100 ...` when needed.
 - Do not get stuck on non-root TrueNAS permission friction if Proxmox root path is available.
 - Creating helper VMs on Proxmox for acceleration/orchestration is permitted when it is faster than alternatives.
